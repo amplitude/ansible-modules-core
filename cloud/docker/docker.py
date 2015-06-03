@@ -252,6 +252,11 @@ options:
         docker-py >= 0.5.0.
     default: false
     version_added: "1.9"
+  stop_timeout:
+    description:
+      - Amount of time (in seconds) to wait for container to stop on stop/restart.
+    default: 10
+    version_added: "1.9"
 
 author: Cove Schneider, Joshua Conner, Pavel Antonov, Ash Wilson
 requirements: [ "docker-py >= 0.3.0", "docker >= 0.10.0" ]
@@ -1267,8 +1272,9 @@ class DockerManager(object):
             self.increment_counter('started')
 
     def stop_containers(self, containers):
+        timeout = int(self.module.params.get('stop_timeout', '10'))
         for i in containers:
-            self.client.stop(i['Id'])
+            self.client.stop(i['Id'], timeout=timeout)
             self.increment_counter('stopped')
 
         return [self.client.wait(i['Id']) for i in containers]
@@ -1284,8 +1290,9 @@ class DockerManager(object):
             self.increment_counter('killed')
 
     def restart_containers(self, containers):
+        timeout = int(self.module.params.get('stop_timeout', 10))
         for i in containers:
-            self.client.restart(i['Id'])
+            self.client.restart(i['Id'], timeout=timeout)
             self.increment_counter('restarted')
 
 
