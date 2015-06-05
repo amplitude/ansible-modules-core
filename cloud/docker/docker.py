@@ -1272,7 +1272,7 @@ class DockerManager(object):
             self.increment_counter('started')
 
     def stop_containers(self, containers):
-        timeout = int(self.module.params.get('stop_timeout', '10'))
+        timeout = self.module.params.get('stop_timeout')
         for i in containers:
             self.client.stop(i['Id'], timeout=timeout)
             self.increment_counter('stopped')
@@ -1290,7 +1290,7 @@ class DockerManager(object):
             self.increment_counter('killed')
 
     def restart_containers(self, containers):
-        timeout = int(self.module.params.get('stop_timeout', 10))
+        timeout = self.module.params.get('stop_timeout')
         for i in containers:
             self.client.restart(i['Id'], timeout=timeout)
             self.increment_counter('restarted')
@@ -1462,6 +1462,7 @@ def main():
             net             = dict(default=None),
             pid             = dict(default=None),
             insecure_registry = dict(default=False, type='bool'),
+            stop_timeout    = dict(default=10, type='int'),
         ),
         required_together = (
             ['tls_client_cert', 'tls_client_key'],
